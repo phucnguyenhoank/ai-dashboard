@@ -1,5 +1,4 @@
-# 🚀 My FastAPI Project
-
+# 🚀 AI Dashboard
 This is a FastAPI-based web application managed with [`uv`](https://docs.astral.sh/uv/) for fast and reproducible dependency management.
 
 ## 📦 Prerequisites
