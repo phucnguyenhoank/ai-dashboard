@@ -13,7 +13,7 @@ This is a FastAPI-based web application managed with [`uv`](https://docs.astral.
 
    ```bash
    git clone https://github.com/phucnguyenhoank/ai-dashboard
-   cd my-fastapi-project
+   cd ai-dashboard
    ```
 
 2. **Install dependencies with `uv`:**
