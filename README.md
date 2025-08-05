@@ -11,7 +11,7 @@ This is a FastAPI-based web application managed with [`uv`](https://docs.astral.
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/phucnguyenhoank/ai-dashboard
+   git clone https://github.com/phucnguyenhoank/ai-dashboard.git
    cd ai-dashboard
    ```
 
