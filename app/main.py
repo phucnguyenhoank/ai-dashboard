@@ -1,10 +1,9 @@
 from fastapi import FastAPI
-from app.api.endpoints import ai_output
+from app.api.endpoints import detections
 
 app = FastAPI(title="AI Dashboard Backend")
 
-# Include API routes
-app.include_router(ai_output.router)
+app.include_router(detections.router)
 
 @app.get("/")
 async def root():
