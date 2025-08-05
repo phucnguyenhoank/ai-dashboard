@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from app.schemas.detection import DetectionCreate, Detection
 from app.core.database import detections_collection
+from bson import ObjectId
 
 router = APIRouter(prefix="/ai", tags=["detections"])
 
@@ -20,3 +21,17 @@ async def get_detections():
         del doc["_id"]  # Remove MongoDB's _id field
         detections.append(Detection(**doc))
     return detections
+
+from fastapi import HTTPException
+
+@router.get("/detections/{id}", response_model=Detection)
+async def get_detection(id: str):
+    try:
+        doc = detections_collection.find_one({"_id": ObjectId(id)})
+        if not doc:
+            raise HTTPException(status_code=404, detail="Detection not found")
+        doc["id"] = str(doc["_id"])
+        del doc["_id"]
+        return Detection(**doc)
+    except:
+        raise HTTPException(status_code=400, detail="Invalid ID format")
