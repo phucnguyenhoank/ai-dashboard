@@ -2,7 +2,9 @@ from fastapi import APIRouter, Query, HTTPException
 from app.schemas.detection import DetectionCreate, Detection
 from app.core.database import detections_collection
 from datetime import timedelta, datetime
-from bson import ObjectId  # Import ObjectId
+from bson import ObjectId
+from app.utils.image_storage import save_base64_image, get_base64_from_path
+
 
 router = APIRouter(prefix="/ai", tags=["detections"])
 
@@ -15,6 +17,7 @@ async def create_detection(detection: DetectionCreate):
     """
     # Check for existing detection within the last 5 seconds
     existing = detections_collection.find_one({
+        "user_id": detection.user_id,
         "camera_id": detection.camera_id,
         "type": detection.type,
         "timestamp": {
@@ -30,19 +33,27 @@ async def create_detection(detection: DetectionCreate):
         existing["id"] = str(existing["_id"])
         return Detection(**existing)
 
-    detection_dict = detection.model_dump()
+    # Save the image and get the path
+    image_path = save_base64_image(detection.base64)
+    if not image_path:
+        raise HTTPException(status_code=500, detail="Failed to save image.")
     
-    result = detections_collection.insert_one(detection_dict)
+    # Save the detection
+    detection_dict = detection.model_dump(exclude={"base64"})
+    detection_dict["image_path"] = image_path
+    
+    save_detection = detections_collection.insert_one(detection_dict)
     
     # After inserting, create the full response object
-    new_detection = detections_collection.find_one({"_id": result.inserted_id})
-    new_detection["id"] = str(new_detection["_id"])
-    
-    return Detection(**new_detection)
+    response_detection = detection.model_dump()
+    response_detection["id"] = str(save_detection["_id"])
+    response_detection["image_path"] = image_path
+    return Detection(**response_detection)
 
 
 @router.get("/detections", response_model=list[Detection])
 async def get_detections(
+    user_id: str = Query(None),
     camera_id: str = Query(None),
     type: str = Query(None),
     start_time: datetime = Query(None),
@@ -55,6 +66,8 @@ async def get_detections(
     a time range. Supports pagination with skip and limit.
     """
     query = {}
+    if user_id:
+        query["user_id"] = user_id
     if camera_id:
         query["camera_id"] = camera_id
     if type:
@@ -75,6 +88,11 @@ async def get_detections(
     for doc in cursor:
         doc["id"] = str(doc["_id"])
         # No need to delete _id, Pydantic will ignore extra fields
+        image_path = doc.get("image_path")
+        if image_path:
+            doc["base64"] = get_base64_from_path(image_path)
+        else:
+            doc["base64"] = None
         detections.append(Detection(**doc))
         
     return detections

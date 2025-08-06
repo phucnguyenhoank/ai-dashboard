@@ -26,7 +26,7 @@ This is a FastAPI-based web application managed with [`uv`](https://docs.astral.
 3. **Run the FastAPI application using `uvicorn`:**
 
    ```bash
-   uv run uvicorn app.main:app --reload
+   uv run uvicorn app.main:app --reload --host 0.0.0.0
    ```
 
 4. **Access the API:**
