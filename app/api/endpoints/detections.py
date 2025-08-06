@@ -99,22 +99,38 @@ async def get_detections(
 
 @router.delete("/detections/{detection_id}")
 async def delete_detection(detection_id: str):
-    """
-    Deletes a detection from the database using its unique ID.
-    """
     try:
-        # Attempt to delete the document by its ObjectId
-        result = detections_collection.delete_one(
-            {"_id": ObjectId(detection_id)}
-        )
-        
-        # If no document was found and deleted, raise a 404 error
-        if result.deleted_count == 0:
-            raise HTTPException(status_code=404, detail=f"Detection with id {detection_id} not found")
-            
-        return {"status": "success", "message": "Detection deleted successfully"}
+        doc = detections_collection.find_one({"_id": ObjectId(detection_id)})
+        if doc:
+            image_path = doc.get("image_path")
+            if image_path and os.path.exists(image_path):
+                os.remove(image_path)  # Delete the file
+            detections_collection.delete_one({"_id": ObjectId(detection_id)})
+            return {"message": "Detection deleted"}
+        raise HTTPException(status_code=404, detail="Detection not found")
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
-    except Exception:
-        # This catches cases where the detection_id is not a valid ObjectId format
-        raise HTTPException(status_code=404, detail=f"Detection with id {detection_id} not found")
+
+@router.delete("/detections")
+async def delete_all_detections():
+    try:
+        docs = detections_collection.find({})  # Get all documents
+
+        deleted_count = 0
+        for doc in docs:
+            image_path = doc.get("image_path")
+            if image_path and os.path.exists(image_path):
+                try:
+                    os.remove(image_path)  # Delete the image file
+                except Exception as e:
+                    print(f"Error deleting file {image_path}: {e}")
+            deleted_count += 1
+
+        detections_collection.delete_many({})  # Remove all documents
+        return {"message": f"Deleted {deleted_count} detections and their images"}
+
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
 

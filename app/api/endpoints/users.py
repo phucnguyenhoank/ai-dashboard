@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException, Query
 from app.schemas.user import UserCreate, User
 from app.core.database import users_collection
 from bson import ObjectId
+import os
 
 router = APIRouter(prefix="/ai", tags=["users"])
 
@@ -41,3 +42,24 @@ async def get_users(
         users.append(User(**doc))
         
     return users
+
+@router.delete("/users")
+async def delete_all_detections():
+    try:
+        docs = users_collection.find({})  # Get all documents
+
+        deleted_count = 0
+        for doc in docs:
+            image_path = doc.get("image_path")
+            if image_path and os.path.exists(image_path):
+                try:
+                    os.remove(image_path)  # Delete the image file
+                except Exception as e:
+                    print(f"Error deleting file {image_path}: {e}")
+            deleted_count += 1
+
+        users_collection.delete_many({})  # Remove all documents
+        return {"message": f"Deleted {deleted_count} users and their images"}
+
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
