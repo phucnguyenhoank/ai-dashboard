@@ -1,0 +1,64 @@
+from fastapi import APIRouter, HTTPException, Query
+from app.schemas.camera import CameraCreate, Camera
+from app.core.database import cameras_collection
+from app.utils.image_storage import save_base64_image, get_base64_from_path
+from bson import ObjectId
+import os
+
+router = APIRouter(prefix="/ai", tags=["cameras"])
+
+@router.post("/cameras", response_model=Camera)
+async def create_camera(camera: CameraCreate):
+    """
+    Creates a new camera, saving its image to disk and storing the path in the database.
+    """
+    # Check if camera_id already exists
+    if cameras_collection.find_one({"camera_id": camera.camera_id}):
+        raise HTTPException(status_code=400, detail=f"Camera with camera_id {camera.camera_id} already exists")
+
+    # Save the image to disk if provided
+    image_path = None
+    if camera.base64:
+        image_path = save_base64_image(camera.base64)
+        if image_path is None:
+            raise HTTPException(status_code=400, detail="Invalid base64 image")
+
+    # Prepare camera data for database (exclude base64, include image_path)
+    camera_dict = camera.dict(exclude={"base64"})
+    camera_dict["image_path"] = image_path
+
+    # Insert into MongoDB
+    result = cameras_collection.insert_one(camera_dict)
+
+    # Prepare response with original base64 and image_path
+    response_dict = camera.dict()
+    response_dict["id"] = str(result.inserted_id)
+    response_dict["image_path"] = image_path
+    return Camera(**response_dict)
+
+@router.get("/cameras", response_model=list[Camera])
+async def get_cameras(
+    camera_id: str = Query(None, description="Filter by camera_id"),
+    skip: int = Query(0, ge=0, description="Number of records to skip for pagination"),
+    limit: int = Query(100, ge=1, le=1000, description="Maximum number of records to return")
+):
+    """
+    Retrieves a list of cameras with optional camera_id filter and pagination.
+    """
+    query = {}
+    if camera_id:
+        query["camera_id"] = camera_id
+
+    cameras = []
+    cursor = cameras_collection.find(query).skip(skip).limit(limit)
+    
+    for doc in cursor:
+        doc["id"] = str(doc["_id"])
+        image_path = doc.get("image_path")
+        if image_path and os.path.exists(image_path):
+            doc["base64"] = get_base64_from_path(image_path)
+        else:
+            doc["base64"] = None
+        cameras.append(Camera(**doc))
+        
+    return cameras

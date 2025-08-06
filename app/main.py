@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.api.endpoints import detections
+from app.api.endpoints import detections, cameras, users
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="AI Dashboard Backend")
@@ -13,6 +13,8 @@ app.add_middleware(
 )
 
 app.include_router(detections.router)
+app.include_router(cameras.router)
+app.include_router(users.router)
 
 @app.get("/")
 async def root():

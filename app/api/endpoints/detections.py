@@ -4,7 +4,7 @@ from app.core.database import detections_collection
 from datetime import timedelta, datetime
 from bson import ObjectId
 from app.utils.image_storage import save_base64_image, get_base64_from_path
-
+import os
 
 router = APIRouter(prefix="/ai", tags=["detections"])
 
@@ -56,14 +56,15 @@ async def get_detections(
     user_id: str = Query(None),
     camera_id: str = Query(None),
     type: str = Query(None),
+    seen: bool | None = Query(None, description="Filter by seen status (True/False), or None to ignore"),
     start_time: datetime = Query(None),
     end_time: datetime = Query(None),
     skip: int = Query(0, ge=0, description="Number of records to skip for pagination"),
     limit: int = Query(100, ge=1, le=1000, description="Maximum number of records to return")
 ):
     """
-    Retrieves a list of detections with optional filters for camera_id, type, and
-    a time range. Supports pagination with skip and limit.
+    Retrieves a list of detections with optional filters for user_id, camera_id, type,
+    seen status, and time range. Supports pagination with skip and limit.
     """
     query = {}
     if user_id:
@@ -72,8 +73,8 @@ async def get_detections(
         query["camera_id"] = camera_id
     if type:
         query["type"] = type
-    
-    # Build the timestamp query based on provided start and end times
+    if seen:
+        query["seen"] = seen
     if start_time and end_time:
         query["timestamp"] = {"$gte": start_time, "$lte": end_time}
     elif start_time:
@@ -82,17 +83,15 @@ async def get_detections(
         query["timestamp"] = {"$lte": end_time}
 
     detections = []
-    # Query the database with sorting and pagination
     cursor = detections_collection.find(query).sort("timestamp", -1).skip(skip).limit(limit)
     
     for doc in cursor:
         doc["id"] = str(doc["_id"])
-        # No need to delete _id, Pydantic will ignore extra fields
         image_path = doc.get("image_path")
-        if image_path:
+        if image_path and os.path.exists(image_path):
             doc["base64"] = get_base64_from_path(image_path)
         else:
-            doc["base64"] = None
+            doc["base64"] = get_base64_from_path('images\loading_cat.png')
         detections.append(Detection(**doc))
         
     return detections
