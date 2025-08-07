@@ -11,3 +11,7 @@ class UserCreate(UserBase):
 
 class User(UserBase):
     id: str
+
+class UserSummary(BaseModel):
+    total_users: int
+    active_users: int

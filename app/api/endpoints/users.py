@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Query
-from app.schemas.user import UserCreate, User
+from app.schemas.user import UserCreate, User, UserSummary
 from app.core.database import users_collection
 from bson import ObjectId
 import os
@@ -51,6 +51,21 @@ async def get_users(
         users.append(User(**doc))
         
     return users
+
+
+@router.get("/users/summary", response_model=UserSummary)
+async def get_user_summary():
+    """
+    Returns total number of users and number of active users.
+    """
+    total = users_collection.count_documents({})
+    active = users_collection.count_documents({"is_active": True})
+
+    return UserSummary(
+        total_users=total,
+        active_users=active
+    )
+
 
 @router.delete("/users")
 async def delete_all_detections():
