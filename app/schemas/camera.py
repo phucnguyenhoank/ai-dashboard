@@ -13,3 +13,6 @@ class CameraCreate(CameraBase):
 class Camera(CameraBase):
     id: str
     image_path: str | None = None  # Stored in DB
+
+class CameraWithStats(Camera):
+    unread_detections: int

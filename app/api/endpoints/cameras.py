@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Query
-from app.schemas.camera import CameraCreate, Camera
-from app.core.database import cameras_collection
+from app.schemas.camera import CameraCreate, Camera, CameraWithStats
+from app.core.database import cameras_collection, detections_collection
 from app.utils.image_storage import save_base64_image, get_base64_from_path
 from bson import ObjectId
 import os
@@ -24,19 +24,19 @@ async def create_camera(camera: CameraCreate):
             raise HTTPException(status_code=400, detail="Invalid base64 image")
 
     # Prepare camera data for database (exclude base64, include image_path)
-    camera_dict = camera.dict(exclude={"base64"})
+    camera_dict = camera.model_dump(exclude={"base64"})
     camera_dict["image_path"] = image_path
 
     # Insert into MongoDB
     result = cameras_collection.insert_one(camera_dict)
 
     # Prepare response with original base64 and image_path
-    response_dict = camera.dict()
+    response_dict = camera.model_dump()
     response_dict["id"] = str(result.inserted_id)
     response_dict["image_path"] = image_path
     return Camera(**response_dict)
 
-@router.get("/cameras", response_model=list[Camera])
+@router.get("/cameras", response_model=list[CameraWithStats])
 async def get_cameras(
     camera_id: str = Query(None, description="Filter by camera_id"),
     name: str = Query(None, description="Filter cameras whose name contains this text"),
@@ -62,7 +62,13 @@ async def get_cameras(
             doc["base64"] = get_base64_from_path(image_path)
         else:
             doc["base64"] = None
-        cameras.append(Camera(**doc))
+        
+        unread_count = detections_collection.count_documents({
+            "camera_id": doc["camera_id"],
+            "seen": False
+        })
+        doc["unread_detections"] = unread_count
+        cameras.append(CameraWithStats(**doc))
         
     return cameras
 
