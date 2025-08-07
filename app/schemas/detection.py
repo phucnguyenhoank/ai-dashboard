@@ -20,3 +20,7 @@ class DetectionCreate(DetectionBase):
 class Detection(DetectionCreate):
     id: str
     image_path: str | None = None
+
+class DetectionListResponse(BaseModel):
+    total: int
+    detections: list[Detection]

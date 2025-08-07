@@ -1,0 +1,17 @@
+{
+    "total_alerts": 19,
+    "unread_alerts": 10,
+    "read_alerts": 9,
+    "total_alert_percentages": [
+        {
+            "type": "sos",
+            "count": 14,
+            "percentage": 73.7
+        },
+        {
+            "type": "dangerous situation",
+            "count": 5,
+            "percentage": 26.3
+        }
+    ]
+}

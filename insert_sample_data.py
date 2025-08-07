@@ -204,7 +204,7 @@ detections = [
         "image_path": "images/det1.jpg"
     },
     {
-        "type": "gun",
+        "type": "knife",
         "lat": 34.0522,
         "long": -118.2437,
         "timestamp": datetime(2023, 10, 2, 14, 30, 0, tzinfo=timezone.utc),
@@ -304,8 +304,8 @@ detections = [
         "lat": 35.6895,
         "long": 139.6917,
         "timestamp": datetime(2023, 10, 10, 12, 30, 0, tzinfo=timezone.utc),
-        "seen": True,
-        "camera_id": "cam5",
+        "seen": False,
+        "camera_id": "cam1",
         "user_id": "user1",
         "camera_name": "Backyard Cam",
         "user_name": "Alice",

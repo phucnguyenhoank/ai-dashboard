@@ -1,5 +1,5 @@
-from fastapi import APIRouter, Query, HTTPException
-from app.schemas.detection import DetectionCreate, Detection
+from fastapi import APIRouter, Query, HTTPException, Path, Body
+from app.schemas.detection import DetectionCreate, Detection, DetectionListResponse
 from app.core.database import detections_collection
 from datetime import timedelta, datetime
 from bson import ObjectId
@@ -51,7 +51,7 @@ async def create_detection(detection: DetectionCreate):
     return Detection(**response_detection)
 
 
-@router.get("/detections", response_model=list[Detection])
+@router.get("/detections", response_model=DetectionListResponse)
 async def get_detections(
     user_id: str = Query(None),
     camera_id: str = Query(None),
@@ -83,7 +83,7 @@ async def get_detections(
         query["timestamp"] = {"$lte": end_time}
 
     detections = []
-    cursor = detections_collection.find(query).sort("timestamp", -1).skip(skip).limit(limit)
+    cursor = detections_collection.find(query).sort([("seen", 1), ("timestamp", -1)]).skip(skip).limit(limit)
     
     for doc in cursor:
         doc["id"] = str(doc["_id"])
@@ -93,8 +93,13 @@ async def get_detections(
         else:
             doc["base64"] = get_base64_from_path('images\loading_cat.png')
         detections.append(Detection(**doc))
-        
-    return detections
+    
+    total_count = detections_collection.count_documents(query)
+
+    return DetectionListResponse(
+        total=total_count,
+        detections=detections
+    )
 
 
 @router.delete("/detections/{detection_id}")
@@ -133,4 +138,33 @@ async def delete_all_detections():
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+
+@router.patch("/detections/{detection_id}/seen", response_model=Detection)
+async def update_detection_seen(
+    detection_id: str = Path(..., description="The ID of the detection to update"),
+    seen: bool = Body(..., description="The new 'seen' status (true/false)")
+):
+    """
+    Update the 'seen' status of a specific detection.
+    """
+    if not ObjectId.is_valid(detection_id):
+        raise HTTPException(status_code=400, detail="Invalid detection ID")
+
+    result = detections_collection.find_one_and_update(
+        {"_id": ObjectId(detection_id)},
+        {"$set": {"seen": seen}},
+        return_document=True  # Return the updated document
+    )
+
+    if not result:
+        raise HTTPException(status_code=404, detail="Detection not found")
+
+    result["id"] = str(result["_id"])
+    image_path = result.get("image_path")
+    if image_path and os.path.exists(image_path):
+        result["base64"] = get_base64_from_path(image_path)
+    else:
+        result["base64"] = get_base64_from_path("images/loading_cat.png")
+
+    return Detection(**result)
 
