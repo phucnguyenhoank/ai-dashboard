@@ -39,6 +39,7 @@ async def create_camera(camera: CameraCreate):
 @router.get("/cameras", response_model=list[Camera])
 async def get_cameras(
     camera_id: str = Query(None, description="Filter by camera_id"),
+    name: str = Query(None, description="Filter cameras whose name contains this text"),
     skip: int = Query(0, ge=0, description="Number of records to skip for pagination"),
     limit: int = Query(100, ge=1, le=1000, description="Maximum number of records to return")
 ):
@@ -48,6 +49,8 @@ async def get_cameras(
     query = {}
     if camera_id:
         query["camera_id"] = camera_id
+    if name:
+        query["name"] = {"$regex": name, "$options": "i"}
 
     cameras = []
     cursor = cameras_collection.find(query).skip(skip).limit(limit)
@@ -62,6 +65,7 @@ async def get_cameras(
         cameras.append(Camera(**doc))
         
     return cameras
+
 
 @router.delete("/cameras")
 async def delete_all_detections():

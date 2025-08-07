@@ -7,7 +7,7 @@ class DetectionBase(BaseModel):
     lat: float
     long: float
     timestamp: datetime
-    seen: bool
+    seen: bool = False
     camera_id: str
     user_id: str
 

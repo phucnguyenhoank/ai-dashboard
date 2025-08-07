@@ -14,16 +14,19 @@ async def create_user(user: UserCreate):
     if users_collection.find_one({"user_id": user.user_id}):
         raise HTTPException(status_code=400, detail=f"User with user_id {user.user_id} already exists")
 
-    user_dict = user.dict()
+    user_dict = user.model_dump()
     result = users_collection.insert_one(user_dict)
     
-    response_dict = user.dict()
+    response_dict = user.model_dump()
     response_dict["id"] = str(result.inserted_id)
     return User(**response_dict)
 
 @router.get("/users", response_model=list[User])
 async def get_users(
     user_id: str = Query(None, description="Filter by user_id"),
+    name: str = Query(None),
+    phone: str = Query(None),
+    is_active: bool = Query(None),
     skip: int = Query(0, ge=0, description="Number of records to skip for pagination"),
     limit: int = Query(100, ge=1, le=1000, description="Maximum number of records to return")
 ):
@@ -33,6 +36,12 @@ async def get_users(
     query = {}
     if user_id:
         query["user_id"] = user_id
+    if name:
+        query["name"] = {"$regex": name, "$options": "i"}
+    if phone:
+        query["phone"] = {"$regex": phone, "$options": "i"}
+    if is_active != None:
+        query["is_active"] = is_active
 
     users = []
     cursor = users_collection.find(query).skip(skip).limit(limit)
