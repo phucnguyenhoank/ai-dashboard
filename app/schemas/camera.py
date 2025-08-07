@@ -16,3 +16,7 @@ class Camera(CameraBase):
 
 class CameraWithStats(Camera):
     unread_detections: int
+
+class CameraSummary(BaseModel):
+    total_cameras: int
+    active_cameras: int

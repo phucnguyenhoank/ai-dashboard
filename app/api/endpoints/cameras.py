@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Query
-from app.schemas.camera import CameraCreate, Camera, CameraWithStats
+from app.schemas.camera import CameraCreate, Camera, CameraWithStats, CameraSummary
 from app.core.database import cameras_collection, detections_collection
 from app.utils.image_storage import save_base64_image, get_base64_from_path
 from bson import ObjectId
@@ -71,6 +71,20 @@ async def get_cameras(
         cameras.append(CameraWithStats(**doc))
         
     return cameras
+
+
+@router.get("/cameras/summary", response_model=CameraSummary)
+async def get_user_summary():
+    """
+    Returns total number of users and number of active users.
+    """
+    total = cameras_collection.count_documents({})
+    active = total # cameras_collection.count_documents({"is_active": True})
+
+    return CameraSummary(
+        total_users=total,
+        active_users=active
+    )
 
 
 @router.delete("/cameras")
