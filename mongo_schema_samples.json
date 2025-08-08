@@ -1,0 +1,38 @@
+{
+    "detection_sample": {
+        "_id": {
+            "$oid": "68944d32d5323ecda5c8442a"
+        },
+        "type": "knife",
+        "lat": 40.7128,
+        "long": -74.006,
+        "timestamp": {
+            "$date": "2023-10-01T12:00:00Z"
+        },
+        "seen": false,
+        "camera_id": "cam1",
+        "user_id": "user1",
+        "camera_name": "Entrance Cam",
+        "user_name": "Alice",
+        "image_path": "images/det1.jpg"
+    },
+    "camera_sample": {
+        "_id": {
+            "$oid": "68944d32d5323ecda5c84420"
+        },
+        "camera_id": "cam1",
+        "name": "Entrance Cam",
+        "image_path": "images/cam1.jpg",
+        "short_description": "Model: AI-Cam X512 | Resolution: 2560\u00d71440 (2K Quad HD)",
+        "details_description": "Model: AI-Cam X512\nResolution: 2560 \u00d7 1440 (2K Quad HD)\nFrame Rate: 30 FPS\nLens: 3.6mm Fixed Lens\nField of View: 110\u00b0 (Horizontal)\nNight Vision: IR-Cut Filter, 30m (98ft) Range\nAI Features:\n  - Person Detection\n  - Vehicle Detection\n  - Face Recognition\n  - Intrusion Zone Detection\n  - License Plate Recognition (LPR)\nVideo Compression: H.265 / H.264 / MJPEG\nAudio: Built-in Mic & Speaker (Two-way audio)\nStorage:\n  - microSD Card up to 256GB\n  - Cloud (optional)\n  - RTSP/NVR supported\nConnectivity:\n  - Ethernet (RJ45, PoE)\n  - Wi-Fi 2.4GHz (optional model)\nPower: PoE (802.3af) or 12V DC\nOperating Temperature: -20\u00b0C to 60\u00b0C\nWaterproof Rating: IP67\nSmart Alerts: Real-time push notification with snapshot\nDimensions: 145mm \u00d7 70mm \u00d7 70mm\nWeight: 350g"
+    },
+    "user_sample": {
+        "_id": {
+            "$oid": "68944d32d5323ecda5c84425"
+        },
+        "user_id": "user1",
+        "name": "Alice",
+        "phone": "+1111111111",
+        "is_active": true
+    }
+}

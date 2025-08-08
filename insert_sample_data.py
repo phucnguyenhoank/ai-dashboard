@@ -310,6 +310,115 @@ detections = [
         "camera_name": "Backyard Cam",
         "user_name": "Alice",
         "image_path": "images/det10.jpg"
+    },
+    # --------------
+    {
+        "type": "knife1",
+        "lat": 40.7128,
+        "long": -74.0060,
+        "timestamp": datetime(2023, 10, 1, 12, 0, 0, tzinfo=timezone.utc),
+        "seen": False,
+        "camera_id": "cam1",
+        "user_id": "user1",
+        "camera_name": "Entrance Cam",
+        "user_name": "Alice",
+        "image_path": "images/det1.jpg"
+    },
+    {
+        "type": "knife1",
+        "lat": 34.0522,
+        "long": -118.2437,
+        "timestamp": datetime(2023, 10, 2, 14, 30, 0, tzinfo=timezone.utc),
+        "seen": False,
+        "camera_id": "cam2",
+        "user_id": "user2",
+        "camera_name": "Parking Lot Cam",
+        "user_name": "Bob",
+        "image_path": "images/det2.jpg"
+    },
+    {
+        "type": "person1",
+        "lat": 51.5074,
+        "long": -0.1278,
+        "timestamp": datetime(2023, 10, 3, 9, 15, 0, tzinfo=timezone.utc),
+        "seen": False,
+        "camera_id": "cam3",
+        "user_id": "user3",
+        "camera_name": "Warehouse Cam",
+        "user_name": "Charlie",
+        "image_path": "images/det3.jpg"
+    },
+    {
+        "type": "car1",
+        "lat": 48.8566,
+        "long": 2.3522,
+        "timestamp": datetime(2023, 10, 4, 16, 45, 0, tzinfo=timezone.utc),
+        "seen": False,
+        "camera_id": "cam4",
+        "user_id": "user4",
+        "camera_name": "Office Cam",
+        "user_name": "David",
+        "image_path": "images/det4.jpg"
+    },
+    {
+        "type": "dog1",
+        "lat": 35.6895,
+        "long": 139.6917,
+        "timestamp": datetime(2023, 10, 5, 11, 20, 0, tzinfo=timezone.utc),
+        "seen": False,
+        "camera_id": "cam5",
+        "user_id": "user5",
+        "camera_name": "Backyard Cam",
+        "user_name": "Eve",
+        "image_path": "images/det5.jpg"
+    },
+    {
+        "type": "knife1",
+        "lat": 40.7128,
+        "long": -74.0060,
+        "timestamp": datetime(2023, 10, 6, 13, 0, 0, tzinfo=timezone.utc),
+        "seen": False,
+        "camera_id": "cam1",
+        "user_id": "user2",
+        "camera_name": "Entrance Cam",
+        "user_name": "Bob",
+        "image_path": "images/det6.jpg"
+    },
+    {
+        "type": "gun1",
+        "lat": 34.0522,
+        "long": -118.2437,
+        "timestamp": datetime(2023, 10, 7, 15, 30, 0, tzinfo=timezone.utc),
+        "seen": False,
+        "camera_id": "cam2",
+        "user_id": "user3",
+        "camera_name": "Parking Lot Cam",
+        "user_name": "Charlie",
+        "image_path": "images/det7.jpg"
+    },
+    {
+        "type": "person1",
+        "lat": 51.5074,
+        "long": -0.1278,
+        "timestamp": datetime(2023, 10, 8, 10, 0, 0, tzinfo=timezone.utc),
+        "seen": False,
+        "camera_id": "cam3",
+        "user_id": "user4",
+        "camera_name": "Warehouse Cam",
+        "user_name": "David",
+        "image_path": "images/det8.jpg"
+    },
+    {
+        "type": "car1",
+        "lat": 48.8566,
+        "long": 2.3522,
+        "timestamp": datetime(2023, 10, 9, 17, 0, 0, tzinfo=timezone.utc),
+        "seen": False,
+        "camera_id": "cam4",
+        "user_id": "user5",
+        "camera_name": "Office Cam",
+        "user_name": "Eve",
+        "image_path": "images/det9.jpg"
     }
 ]
 

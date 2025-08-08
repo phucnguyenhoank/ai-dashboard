@@ -82,8 +82,8 @@ async def get_user_summary():
     active = total # cameras_collection.count_documents({"is_active": True})
 
     return CameraSummary(
-        total_users=total,
-        active_users=active
+        total_cameras=total,
+        active_cameras=active
     )
 
 
